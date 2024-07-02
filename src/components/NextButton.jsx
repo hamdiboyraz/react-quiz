@@ -1,14 +1,19 @@
-function NextButton({answer, dispatch}) {
+function NextButton({answer, index, numberOfQuestions, dispatch}) {
     if (answer === null) return null;
+
+    const isLastQuestion = index === numberOfQuestions - 1;
+    const buttonText = isLastQuestion ? "Finish" : "Next";
+    const actionType = isLastQuestion ? "finish" : "nextQuestion";
 
     return (
         <button
             className="btn btn-ui"
-            onClick={() => dispatch({type: "nextQuestion"})}
+            onClick={() => dispatch({type: actionType})}
         >
-            Next
+            {buttonText}
         </button>
-    )
+    );
 }
+
 
 export default NextButton;
