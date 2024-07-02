@@ -53,8 +53,14 @@ function reducer(state, action) {
             return {
                 ...state,
                 status: "finished",
-                highScore: state.points > state.highScore ? state.points : state.highScore
+                highScore: state.points > state.highScore ? state.points : state.highScore,
 
+            }
+        case "restart":
+            return {
+                ...initialState,
+                questions: state.questions,
+                status: "ready",
             }
         default:
             throw new Error("Unknown action");
@@ -103,7 +109,8 @@ function App() {
                         />
                     </>
                 )}
-                {status === "finished" && <FinishScreen points={points} maxPoints={maxPoints} highScore={highScore}/>}
+                {status === "finished" &&
+                    <FinishScreen points={points} maxPoints={maxPoints} highScore={highScore} dispatch={dispatch}/>}
             </Main>
         </div>
     );
