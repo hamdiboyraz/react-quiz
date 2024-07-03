@@ -1,4 +1,5 @@
 import {useEffect, useReducer} from "react";
+
 import Header from "./components/Header";
 import Main from "./components/Main";
 import Loader from "./components/Loader";
@@ -8,6 +9,10 @@ import Question from "./components/Question";
 import NextButton from "./components/NextButton";
 import Progress from "./components/Progress";
 import FinishScreen from "./components/FinishScreen";
+import Footer from "./components/Footer";
+import Timer from "./components/Timer";
+
+const SECS_PER_QUESTION = 20;
 
 const initialState = {
     questions: [],
@@ -16,6 +21,7 @@ const initialState = {
     answer: null,
     points: 0,
     highScore: 0,
+    secondsRemaining: null,
 }
 
 function reducer(state, action) {
@@ -34,7 +40,8 @@ function reducer(state, action) {
         case "start":
             return {
                 ...state,
-                status: "active"
+                status: "active",
+                secondsRemaining: state.questions.length * SECS_PER_QUESTION,
             }
         case "newAnswer":
             const currentQuestion = state.questions[state.index]; // state.questions.at(state.index)
@@ -62,13 +69,27 @@ function reducer(state, action) {
                 questions: state.questions,
                 status: "ready",
             }
+        case "tick":
+            return {
+                ...state,
+                secondsRemaining: state.secondsRemaining - 1,
+                status: state.secondsRemaining === 0 ? "finished" : state.status
+            }
         default:
             throw new Error("Unknown action");
     }
 }
 
 function App() {
-    const [{questions, status, index, answer, points, highScore}, dispatch] = useReducer(reducer, initialState);
+    const [{
+        questions,
+        status,
+        index,
+        answer,
+        points,
+        highScore,
+        secondsRemaining
+    }, dispatch] = useReducer(reducer, initialState);
 
     const numberOfQuestions = questions.length;
     const maxPoints = questions.reduce((prev, cur) => prev + cur.points, 0);
@@ -101,12 +122,15 @@ function App() {
                             answer={answer}
                             dispatch={dispatch}
                         />
-                        <NextButton
-                            answer={answer}
-                            index={index}
-                            numberOfQuestions={numberOfQuestions}
-                            dispatch={dispatch}
-                        />
+                        <Footer>
+                            <Timer secondsRemaining={secondsRemaining} dispatch={dispatch}/>
+                            <NextButton
+                                answer={answer}
+                                index={index}
+                                numberOfQuestions={numberOfQuestions}
+                                dispatch={dispatch}
+                            />
+                        </Footer>
                     </>
                 )}
                 {status === "finished" &&
